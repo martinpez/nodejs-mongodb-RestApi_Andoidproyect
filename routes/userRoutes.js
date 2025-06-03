@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
     }
   });
 
-router.get('/manyGet', async (req, res) => {
+router.get('/manyget', async (req, res) => {
     try {
       const users = await User.find();
       res.status(200).json({ success: true, data: users });
@@ -141,6 +141,26 @@ router.post('/many', async (req, res) => {
       res.status(201).json({ success: true, data: savedUsers });
   } catch (error) {
       res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+
+//buscar 
+router.get("/search", async (req, res) => {
+  try {
+    const query = req.query.key; // Obtener el término de búsqueda
+    const users = await User.find({
+      $or: [
+        {name:  {$regex: query, $options: "i"}}, 
+        {rol:   {$regex: query, $options: "i"}}, 
+        {phone: {$regex: query, $options: "i"}},
+        {email: {$regex: query, $options: "i"}} //
+      ]
+  }).select("name email"); // Solo devolver name y email
+
+    res.json(users);
+  } catch (error) {
+      res.status(500).json({ message: "Error al buscar usuarios", error });
   }
 });
 
